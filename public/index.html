@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Projetos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Controle de Projetos e Tarefas Empresariais</h1>
+    </header>
+
+    <!-- Caixa inicial com as opções Login e Cadastro -->
+    <div id="caixa-login-cadastro">
+        <button id="btn-login">Login</button>
+        <button id="btn-cadastro">Cadastro</button>
+    </div>
+
+    <!-- Tela de Login -->
+    <section id="login" class="tela" style="display: none;">
+        <h2>Login</h2>
+        <form id="form-login">
+            <label for="login-email">Email:</label>
+            <input type="email" id="login-email" name="email" required>
+            <br>
+            <label for="login-password">Senha:</label>
+            <input type="password" id="login-password" name="password" required>
+            <br>
+            <button type="submit">Entrar</button>
+        </form>
+        <button id="btn-voltar-login">Voltar</button>
+    </section>
+
+    <!-- Tela de Cadastro -->
+    <section id="cadastro" class="tela" style="display: none;">
+        <h2>Cadastro</h2>
+        <form id="form-cadastro">
+            <label for="cadastro-nome">Nome:</label>
+            <input type="text" id="cadastro-nome" name="nome" required>
+            <br>
+            <label for="cadastro-email">Email:</label>
+            <input type="email" id="cadastro-email" name="email" required>
+            <br>
+            <label for="cadastro-password">Senha:</label>
+            <input type="password" id="cadastro-password" name="password" required>
+            <br>
+            <button type="submit">Cadastrar</button>
+        </form>
+        <button id="btn-voltar-cadastro">Voltar</button>
+    </section>
+
+    <!-- Tela de Controle de Projetos -->
+    <section id="projeto" class="tela" style="display: none;">
+        <h2>Criação de Projetos</h2>
+        <form id="form-projeto">
+            <label for="nome">Nome do Projeto:</label>
+            <input type="text" id="nome" name="nome" required>
+            <br>
+            <label for="descricao">Descrição:</label>
+            <input type="text" id="descricao" name="descricao" required>
+            <br>
+            <button type="submit">Criar Projeto</button>
+        </form>
+
+        <h2>Lista de Projetos</h2>
+        <ul id="lista-projetos"></ul>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Controle de Projetos | <a href="#">Política de Privacidade</a></p>
+    </footer>
+
+    <script>
+        // Elementos das telas
+        const caixaLoginCadastro = document.getElementById('caixa-login-cadastro');
+        const telaLogin = document.getElementById('login');
+        const telaCadastro = document.getElementById('cadastro');
+        const telaProjeto = document.getElementById('projeto');
+
+        // Botões de navegação
+        const btnLogin = document.getElementById('btn-login');
+        const btnCadastro = document.getElementById('btn-cadastro');
+        const btnVoltarLogin = document.getElementById('btn-voltar-login');
+        const btnVoltarCadastro = document.getElementById('btn-voltar-cadastro');
+
+        // Exibir tela de login ou cadastro
+        btnLogin.addEventListener('click', () => {
+            caixaLoginCadastro.style.display = 'none';
+            telaLogin.style.display = 'block';
+        });
+
+        btnCadastro.addEventListener('click', () => {
+            caixaLoginCadastro.style.display = 'none';
+            telaCadastro.style.display = 'block';
+        });
+
+        // Voltar para a tela inicial
+        btnVoltarLogin.addEventListener('click', () => {
+            telaLogin.style.display = 'none';
+            caixaLoginCadastro.style.display = 'block';
+        });
+
+        btnVoltarCadastro.addEventListener('click', () => {
+            telaCadastro.style.display = 'none';
+            caixaLoginCadastro.style.display = 'block';
+        });
+
+        // Função para exibir a tela de projetos após login
+        function mostrarTelaProjetos() {
+            telaLogin.style.display = 'none';
+            telaProjeto.style.display = 'block';
+            obterProjetos(); // Carregar projetos
+        }
+
+        // Função de cadastro - envia para a tela de login
+        document.getElementById('form-cadastro').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('cadastro-nome').value;
+            const email = document.getElementById('cadastro-email').value;
+            const password = document.getElementById('cadastro-password').value;
+
+            // Simulando cadastro (pode ser substituído por lógica real de backend)
+            alert(`Usuário ${nome} cadastrado com sucesso!`);
+            telaCadastro.style.display = 'none';
+            caixaLoginCadastro.style.display = 'block';
+        });
+
+        // Função de login - envia para a tela de projetos
+        document.getElementById('form-login').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            // Simulando login (substitua com lógica real)
+            if (email && password) {
+                mostrarTelaProjetos();
+            } else {
+                alert('Credenciais inválidas');
+            }
+        });
+
+        // Funções para manipular projetos
+        function obterProjetos() {
+            fetch('http://localhost:3000/projetos')
+                .then(response => response.json())
+                .then(data => {
+                    const listaProjetos = document.getElementById('lista-projetos');
+                    listaProjetos.innerHTML = ''; // Limpar a lista antes de adicionar
+
+                    data.forEach(projeto => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span><strong>Nome:</strong> ${projeto.nome}  <strong>Descrição:</strong> ${projeto.descricao}</span>
+                            <div>
+                                <button onclick="editarProjeto(${projeto.id})">Editar</button>
+                                <button onclick="excluirProjeto(${projeto.id})">Excluir</button>
+                            </div>
+                        `;
+                        listaProjetos.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Erro ao obter projetos:', error));
+        }
+
+        document.getElementById('form-projeto').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const descricao = document.getElementById('descricao').value;
+
+            fetch('http://localhost:3000/projetos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, descricao }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    alert(`Projeto criado: ${data.nome}`);
+                    obterProjetos(); // Atualizar lista após criar o projeto
+                } else {
+                    alert('Erro ao criar projeto');
+                }
+            })
+            .catch(error => console.error('Erro ao criar projeto:', error));
+        });
+
+        function editarProjeto(id) {
+            const novoNome = prompt('Novo nome do projeto:');
+            const novaDescricao = prompt('Nova descrição do projeto:');
+
+            if (novoNome && novaDescricao) {
+                fetch(`http://localhost:3000/projetos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nome: novoNome, descricao: novaDescricao }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.id) {
+                        alert(`Projeto editado: ${data.nome}`);
+                        obterProjetos();
+                    } else {
+                        alert('Erro ao editar projeto');
+                    }
+                })
+                .catch(error => console.error('Erro ao editar projeto:', error));
+            }
+        }
+
+        function excluirProjeto(id) {
+            if (confirm('Tem certeza que deseja excluir este projeto?')) {
+                fetch(`http://localhost:3000/projetos/${id}`, {
+                    method: 'DELETE',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        obterProjetos(); // Atualizar lista após excluir o projeto
+                    } else {
+                        alert('Erro ao excluir projeto');
+                    }
+                })
+                .catch(error => console.error('Erro ao excluir projeto:', error));
+            }
+        }
+
+    </script>
+</body>
+</html>
